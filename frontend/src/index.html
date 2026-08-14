@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="secureBankApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecureBank | Digital Banking</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="vendor/bootstrap.min.css" />
+  <link rel="stylesheet" href="vendor/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body ng-controller="ShellController as shell">
+
+  <!-- ==================== Toast notifications (global) ==================== -->
+  <div class="toast-stack" aria-live="polite">
+    <div class="toast-item" ng-class="'toast-' + toast.type" ng-repeat="toast in shell.toasts track by toast.id">
+      <i class="bi bi-check-circle-fill" ng-if="toast.type === 'success'"></i>
+      <i class="bi bi-exclamation-triangle-fill" ng-if="toast.type === 'danger'"></i>
+      <i class="bi bi-info-circle-fill" ng-if="toast.type === 'info'"></i>
+      <span>{{ toast.message }}</span>
+      <button class="toast-close" ng-click="shell.dismissToast(toast.id)" aria-label="Dismiss">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== Authenticated app shell ==================== -->
+  <div class="app-shell" ng-if="shell.currentUser">
+    <div class="sidebar-backdrop" ng-if="shell.isSidebarOpen" ng-click="shell.closeSidebar()"></div>
+
+    <aside class="sidebar" ng-class="{open: shell.isSidebarOpen}">
+      <div class="brand">
+        <div class="brand-icon">SB</div>
+        <h1 class="brand-mark mb-0">SecureBank</h1>
+      </div>
+      <nav>
+        <a href="#!/dashboard" class="nav-link" ng-class="{active: shell.isActive('/dashboard')}">
+          <i class="bi bi-grid-1x2"></i> Dashboard
+        </a>
+        <a href="#!/transfer" class="nav-link" ng-class="{active: shell.isActive('/transfer')}">
+          <i class="bi bi-arrow-left-right"></i> Transfer money
+        </a>
+        <a href="#!/profile" class="nav-link" ng-class="{active: shell.isActive('/profile')}">
+          <i class="bi bi-person"></i> Profile
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        SecureBank v1.0.0<br />
+        Digital Banking Platform
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="d-flex align-center gap-3">
+          <button class="sidebar-toggle" ng-click="shell.toggleSidebar()" aria-label="Toggle navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="text-muted security-note">
+            <i class="bi bi-shield-lock"></i> <span>Session secured with JWT</span>
+          </div>
+        </div>
+        <div class="user-chip">
+          <div class="avatar">{{ shell.initials(shell.currentUser.fullName) }}</div>
+          <div class="user-chip-text">
+            <div>{{ shell.currentUser.fullName }}</div>
+            <div class="text-muted" style="font-size:0.75rem;">{{ shell.currentUser.email }}</div>
+          </div>
+          <button class="btn btn-outline btn-sm" ng-click="shell.logout()">
+            <i class="bi bi-box-arrow-right"></i> <span class="btn-label">Log out</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="content">
+        <div ng-view></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== Public (unauthenticated) views ==================== -->
+  <div ng-if="!shell.currentUser">
+    <div ng-view></div>
+  </div>
+
+  <!-- ==================== Vendor JS ==================== -->
+  <script src="vendor/angular.min.js"></script>
+  <script src="vendor/angular-route.min.js"></script>
+  <script src="vendor/angular-resource.min.js"></script>
+  <script src="vendor/bootstrap.bundle.min.js"></script>
+
+  <!-- ==================== App JS ==================== -->
+  <script src="app/app.module.js"></script>
+  <script src="app/app.config.js"></script>
+  <script src="app/interceptors/auth.interceptor.js"></script>
+  <script src="app/filters/mask-account.filter.js"></script>
+  <script src="app/services/auth.service.js"></script>
+  <script src="app/services/account.service.js"></script>
+  <script src="app/services/transaction.service.js"></script>
+  <script src="app/services/transfer.service.js"></script>
+  <script src="app/services/notification.service.js"></script>
+  <script src="app/controllers/shell.controller.js"></script>
+  <script src="app/controllers/login.controller.js"></script>
+  <script src="app/controllers/register.controller.js"></script>
+  <script src="app/controllers/dashboard.controller.js"></script>
+  <script src="app/controllers/account-detail.controller.js"></script>
+  <script src="app/controllers/transfer.controller.js"></script>
+  <script src="app/controllers/profile.controller.js"></script>
+</body>
+</html>

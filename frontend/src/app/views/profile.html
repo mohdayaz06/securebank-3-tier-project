@@ -1,0 +1,70 @@
+<div class="page-header">
+  <div>
+    <span class="eyebrow">Account settings</span>
+    <h1>Your profile</h1>
+  </div>
+</div>
+
+<div class="card form-panel" style="margin-bottom:20px;" ng-if="!vm.isLoading">
+  <h2 style="font-size:1rem; margin-top:0; display:flex; align-items:center; gap:8px;">
+    <i class="bi bi-person-circle" style="color:var(--c-accent);"></i> Personal information
+  </h2>
+
+  <div class="alert alert-success" ng-if="vm.profileMessage"><i class="bi bi-check-circle"></i> {{ vm.profileMessage }}</div>
+  <div class="alert alert-danger" ng-if="vm.profileError"><i class="bi bi-exclamation-triangle"></i> {{ vm.profileError }}</div>
+
+  <form name="profileForm" novalidate ng-submit="vm.saveProfile(profileForm)">
+    <div class="form-group">
+      <label for="fullName">Full name</label>
+      <input type="text" id="fullName" name="fullName" class="form-control"
+        ng-model="vm.profile.fullName" required maxlength="120" />
+    </div>
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input type="email" id="email" class="form-control" ng-model="vm.profile.email" disabled />
+      <div class="hint"><i class="bi bi-lock"></i> Email address cannot be changed.</div>
+    </div>
+    <div class="form-group">
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" class="form-control" ng-model="vm.profile.phone" placeholder="+1 555-0100" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" ng-disabled="vm.isSavingProfile">
+      <span class="spinner" ng-if="vm.isSavingProfile"></span>
+      <span ng-if="!vm.isSavingProfile">Save changes</span>
+      <span ng-if="vm.isSavingProfile">Saving...</span>
+    </button>
+  </form>
+</div>
+
+<div class="card form-panel">
+  <h2 style="font-size:1rem; margin-top:0; display:flex; align-items:center; gap:8px;">
+    <i class="bi bi-shield-lock" style="color:var(--c-accent);"></i> Change password
+  </h2>
+  <p class="text-muted" style="font-size:0.82rem; margin-top:-8px; margin-bottom:16px;">
+    Your password is never stored in plain text - only a salted hash is kept.
+  </p>
+
+  <div class="alert alert-success" ng-if="vm.passwordMessage"><i class="bi bi-check-circle"></i> {{ vm.passwordMessage }}</div>
+  <div class="alert alert-danger" ng-if="vm.passwordError"><i class="bi bi-exclamation-triangle"></i> {{ vm.passwordError }}</div>
+
+  <form name="passwordForm" novalidate ng-submit="vm.savePassword(passwordForm)">
+    <div class="form-group">
+      <label for="currentPassword">Current password</label>
+      <input type="password" id="currentPassword" name="currentPassword" class="form-control"
+        ng-model="vm.passwordForm.currentPassword" required />
+    </div>
+    <div class="form-group">
+      <label for="newPassword">New password</label>
+      <input type="password" id="newPassword" name="newPassword" class="form-control"
+        ng-model="vm.passwordForm.newPassword" required minlength="8" />
+      <div class="hint">Must include an uppercase letter and a number.</div>
+    </div>
+
+    <button type="submit" class="btn btn-outline" ng-disabled="vm.isSavingPassword">
+      <span class="spinner" ng-if="vm.isSavingPassword"></span>
+      <span ng-if="!vm.isSavingPassword">Update password</span>
+      <span ng-if="vm.isSavingPassword">Updating...</span>
+    </button>
+  </form>
+</div>

@@ -1,0 +1,60 @@
+<div class="auth-shell">
+  <div class="auth-brand-panel">
+    <div class="brand-icon" style="width:44px;height:44px;font-size:1.15rem;">SB</div>
+    <h1>Banking that stays out of your way.</h1>
+    <p>SecureBank gives you a clear view of every account, every transaction, and every transfer.</p>
+
+    <div class="stack">
+      <div class="mini-ledger"><span>Payroll deposit</span><span class="amt">+$2,150.00</span></div>
+      <div class="mini-ledger"><span>Transfer to savings</span><span class="amt">-$500.00</span></div>
+      <div class="mini-ledger"><span>Interest credit</span><span class="amt">+$12.40</span></div>
+    </div>
+  </div>
+
+  <div class="auth-form-panel">
+    <div class="auth-form-inner">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to access your accounts.</p>
+
+      <div class="alert alert-danger" ng-if="vm.errorMessage">{{ vm.errorMessage }}</div>
+
+      <form name="loginForm" novalidate ng-submit="vm.submit(loginForm)">
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input
+            type="email" id="email" name="email" class="form-control"
+            ng-class="{'is-invalid': loginForm.email.$invalid && loginForm.email.$touched}"
+            ng-model="vm.credentials.email" required placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-icon-wrap">
+            <input
+              ng-attr-type="{{ vm.showPassword ? 'text' : 'password' }}" id="password" name="password" class="form-control"
+              ng-model="vm.credentials.password" required placeholder="••••••••"
+            />
+            <button type="button" class="input-icon-btn" ng-click="vm.togglePasswordVisibility()" aria-label="Show password">
+              <i class="bi" ng-class="vm.showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;" ng-disabled="vm.isSubmitting">
+          <span class="spinner" ng-if="vm.isSubmitting"></span>
+          <span ng-if="!vm.isSubmitting">Sign in</span>
+          <span ng-if="vm.isSubmitting">Signing in...</span>
+        </button>
+      </form>
+
+      <p class="text-muted" style="margin-top:20px; font-size:0.85rem;">
+        Don't have an account? <a href="#!/register">Open an account</a>
+      </p>
+
+      <p class="text-muted" style="margin-top:12px; font-size:0.78rem;">
+        Demo: <code>priya.menon@example.com</code> / <code>Password@123</code>
+      </p>
+    </div>
+  </div>
+</div>

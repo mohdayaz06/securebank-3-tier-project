@@ -1,0 +1,74 @@
+<div class="auth-shell">
+  <div class="auth-brand-panel">
+    <div class="brand-icon" style="width:44px;height:44px;font-size:1.15rem;">SB</div>
+    <h1>Open an account in minutes.</h1>
+    <p>Register to get a checking account, a debit-ready balance, and full transfer access.</p>
+
+    <div class="stack">
+      <div class="mini-ledger"><span><i class="bi bi-shield-check"></i>&nbsp; Bank-grade password hashing</span></div>
+      <div class="mini-ledger"><span><i class="bi bi-lock"></i>&nbsp; JWT-secured sessions</span></div>
+      <div class="mini-ledger"><span><i class="bi bi-graph-up"></i>&nbsp; Real-time balance tracking</span></div>
+    </div>
+  </div>
+
+  <div class="auth-form-panel">
+    <div class="auth-form-inner">
+      <h2>Create your account</h2>
+      <p class="sub">A checking account is opened automatically.</p>
+
+      <div class="alert alert-danger" ng-if="vm.errorMessage">{{ vm.errorMessage }}</div>
+
+      <form name="registerForm" novalidate ng-submit="vm.submit(registerForm)">
+        <div class="form-group">
+          <label for="fullName">Full name</label>
+          <input type="text" id="fullName" name="fullName" class="form-control"
+            ng-model="vm.form.fullName" required maxlength="120" placeholder="Priya Menon" />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-email">Email address</label>
+          <input type="email" id="reg-email" name="email" class="form-control"
+            ng-model="vm.form.email" required placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone (optional)</label>
+          <input type="tel" id="phone" name="phone" class="form-control"
+            ng-model="vm.form.phone" placeholder="+1 555-0100" />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" name="password" class="form-control"
+            ng-model="vm.form.password" ng-change="vm.onPasswordChange()"
+            required minlength="8" placeholder="At least 8 characters" />
+          <div class="strength-meter" ng-class="vm.passwordStrength.className" ng-if="vm.form.password">
+            <div class="strength-bar" ng-repeat="i in [1,2,3,4,5]"></div>
+          </div>
+          <div class="strength-label" ng-if="vm.passwordStrength.label">{{ vm.passwordStrength.label }} password</div>
+          <div class="hint" ng-if="!vm.form.password">Must include an uppercase letter and a number.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+            ng-class="{'is-invalid': vm.confirmPassword && vm.confirmPassword !== vm.form.password}"
+            ng-model="vm.confirmPassword" required placeholder="Re-enter your password" />
+          <div class="field-error" ng-if="vm.confirmPassword && vm.confirmPassword !== vm.form.password">
+            Passwords do not match.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;" ng-disabled="vm.isSubmitting">
+          <span class="spinner" ng-if="vm.isSubmitting"></span>
+          <span ng-if="!vm.isSubmitting">Create account</span>
+          <span ng-if="vm.isSubmitting">Creating account...</span>
+        </button>
+      </form>
+
+      <p class="text-muted" style="margin-top:20px; font-size:0.85rem;">
+        Already have an account? <a href="#!/login">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>

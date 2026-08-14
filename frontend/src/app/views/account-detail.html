@@ -1,0 +1,139 @@
+<div class="page-header" ng-if="vm.account">
+  <div>
+    <span class="eyebrow">{{ vm.account.account_type }} account</span>
+    <div class="nickname-row" ng-if="!vm.isEditingNickname">
+      <h1>{{ vm.account.nickname || (vm.account.account_type + ' account') }}</h1>
+      <button class="nickname-edit-btn" ng-click="vm.startEditNickname()" aria-label="Edit account label">
+        <i class="bi bi-pencil"></i>
+      </button>
+    </div>
+    <div class="nickname-row" ng-if="vm.isEditingNickname">
+      <input type="text" class="form-control" style="max-width:220px;" maxlength="50"
+        ng-model="vm.nicknameDraft" placeholder="e.g. Emergency fund" />
+      <button class="btn btn-primary btn-sm" ng-click="vm.saveNickname()" ng-disabled="vm.isSavingNickname">
+        <span class="spinner" ng-if="vm.isSavingNickname"></span>
+        <span ng-if="!vm.isSavingNickname">Save</span>
+      </button>
+      <button class="btn btn-outline btn-sm" ng-click="vm.cancelEditNickname()">Cancel</button>
+    </div>
+  </div>
+  <a href="#!/transfer" class="btn btn-primary"><i class="bi bi-arrow-left-right"></i> Transfer money</a>
+</div>
+
+<div class="alert alert-danger" ng-if="vm.errorMessage">{{ vm.errorMessage }}</div>
+
+<div class="card" style="padding:20px; margin-bottom:20px; background:var(--c-primary); color:#fff; border:none;" ng-if="vm.account">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:#9fb3cc;">Current balance</div>
+      <div class="mono" style="font-size:2rem; font-weight:500;">{{ vm.account.balance | currency }}</div>
+      <div class="mono" style="font-size:0.82rem; margin-top:4px; color:#cdd9e8;">
+        {{ vm.isMasked ? (vm.account.account_number | maskAccount) : vm.account.account_number }}
+        <button class="mask-toggle" ng-click="vm.toggleMask()" aria-label="Toggle account number visibility">
+          <i class="bi" ng-class="vm.isMasked ? 'bi-eye' : 'bi-eye-slash'"></i>
+        </button>
+      </div>
+    </div>
+    <span class="badge" ng-class="vm.account.status === 'active' ? 'badge-success' : 'badge-danger'" style="align-self:flex-start;">
+      {{ vm.account.status }}
+    </span>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <button class="btn btn-outline" ng-click="vm.openPanel('deposit')"><i class="bi bi-plus-circle"></i> Deposit</button>
+  <button class="btn btn-outline" ng-click="vm.openPanel('withdraw')"><i class="bi bi-dash-circle"></i> Withdraw</button>
+  <button class="btn btn-outline" ng-click="vm.exportCsv()" ng-disabled="!vm.transactions.length"><i class="bi bi-download"></i> Export CSV</button>
+</div>
+
+<div class="money-panel" ng-if="vm.activePanel">
+  <div class="panel-title">
+    <span>{{ vm.activePanel === 'deposit' ? 'Deposit funds' : 'Withdraw funds' }}</span>
+    <button class="panel-close" ng-click="vm.closePanel()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="alert alert-danger" ng-if="vm.moneyError" style="margin-bottom:12px;">{{ vm.moneyError }}</div>
+  <form name="moneyForm" novalidate ng-submit="vm.submitMoney(moneyForm)">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="moneyAmount">Amount (USD)</label>
+        <input type="number" id="moneyAmount" name="amount" class="form-control" min="0.01" step="0.01"
+          ng-model="vm.moneyForm.amount" required placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label for="moneyDescription">Note (optional)</label>
+        <input type="text" id="moneyDescription" name="description" class="form-control"
+          ng-model="vm.moneyForm.description" maxlength="255" placeholder="e.g. ATM deposit" />
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" ng-disabled="vm.isSubmittingMoney">
+      <span class="spinner" ng-if="vm.isSubmittingMoney"></span>
+      <span ng-if="!vm.isSubmittingMoney">Confirm {{ vm.activePanel }}</span>
+      <span ng-if="vm.isSubmittingMoney">Processing...</span>
+    </button>
+  </form>
+</div>
+
+<div class="card table-card">
+  <div style="padding:16px 20px; border-bottom:1px solid var(--c-border);">
+    <h2 style="font-size:1rem; margin:0;">Transaction history</h2>
+  </div>
+
+  <form class="filter-bar" ng-submit="vm.applyFilters()">
+    <div class="form-group" style="flex:2; min-width:180px;">
+      <label>Search description</label>
+      <input type="text" class="form-control" placeholder="e.g. Payroll, ATM" ng-model="vm.filters.search" />
+    </div>
+    <div class="form-group" style="flex:1; min-width:150px;">
+      <label>Type</label>
+      <select class="form-control" ng-model="vm.filters.type">
+        <option value="">All types</option>
+        <option value="deposit">Deposit</option>
+        <option value="withdrawal">Withdrawal</option>
+        <option value="transfer_in">Transfer in</option>
+        <option value="transfer_out">Transfer out</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Filter</button>
+  </form>
+
+  <div ng-if="vm.isLoading" style="padding:8px 20px;">
+    <div class="skeleton skeleton-line" style="width:90%;"></div>
+    <div class="skeleton skeleton-line" style="width:75%;"></div>
+    <div class="skeleton skeleton-line" style="width:85%;"></div>
+  </div>
+
+  <div class="empty-state" ng-if="!vm.isLoading && vm.transactions.length === 0">
+    <i class="bi bi-receipt"></i>
+    No transactions match these filters.
+  </div>
+
+  <div ng-if="!vm.isLoading">
+    <div class="ledger-row" ng-class="{debit: t.type === 'withdrawal' || t.type === 'transfer_out'}" ng-repeat="t in vm.transactions">
+      <div class="ledger-main">
+        <div class="ledger-icon">
+          <i class="bi bi-arrow-down-left" ng-if="t.type === 'deposit' || t.type === 'transfer_in'"></i>
+          <i class="bi bi-arrow-up-right" ng-if="t.type === 'withdrawal' || t.type === 'transfer_out'"></i>
+        </div>
+        <div>
+          <div class="ledger-desc">{{ t.description }}</div>
+          <div class="ledger-meta">{{ t.created_at | date:'MMM d, y, h:mm a' }}</div>
+        </div>
+      </div>
+      <div class="ledger-right">
+        <div class="ledger-amount mono" ng-class="{credit: t.type === 'deposit' || t.type === 'transfer_in', debit: t.type === 'withdrawal' || t.type === 'transfer_out'}">
+          <span ng-if="t.type === 'deposit' || t.type === 'transfer_in'">+</span>
+          <span ng-if="t.type === 'withdrawal' || t.type === 'transfer_out'">-</span>{{ t.amount | currency }}
+        </div>
+        <div class="ledger-balance mono">Balance: {{ t.balance_after | currency }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination-bar" ng-if="vm.pagination.pages > 1">
+    <span>Page {{ vm.pagination.page }} of {{ vm.pagination.pages }} &middot; {{ vm.pagination.total }} total</span>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline btn-sm" ng-disabled="vm.pagination.page <= 1" ng-click="vm.goToPage(vm.pagination.page - 1)">Previous</button>
+      <button class="btn btn-outline btn-sm" ng-disabled="vm.pagination.page >= vm.pagination.pages" ng-click="vm.goToPage(vm.pagination.page + 1)">Next</button>
+    </div>
+  </div>
+</div>

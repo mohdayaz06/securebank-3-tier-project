@@ -1,0 +1,108 @@
+<div class="page-header">
+  <div>
+    <span class="eyebrow">Move money</span>
+    <h1>Transfer money</h1>
+  </div>
+</div>
+
+<div class="step-indicator">
+  <div class="step" ng-class="{active: vm.step === 'form', done: vm.step === 'review' || vm.step === 'success'}">
+    <span class="step-dot">1</span> Details
+  </div>
+  <div class="step-line"></div>
+  <div class="step" ng-class="{active: vm.step === 'review', done: vm.step === 'success'}">
+    <span class="step-dot">2</span> Review
+  </div>
+  <div class="step-line"></div>
+  <div class="step" ng-class="{active: vm.step === 'success'}">
+    <span class="step-dot">3</span> Done
+  </div>
+</div>
+
+<div class="alert alert-danger" ng-if="vm.errorMessage">{{ vm.errorMessage }}</div>
+
+<!-- Step 1: enter details -->
+<div class="card form-panel" ng-if="!vm.isLoading && vm.step === 'form'">
+  <form name="transferForm" novalidate ng-submit="vm.reviewTransfer(transferForm)">
+    <div class="form-group">
+      <label for="fromAccountId">From account</label>
+      <select id="fromAccountId" name="fromAccountId" class="form-control" ng-model="vm.form.fromAccountId" required>
+        <option ng-repeat="acc in vm.accounts" value="{{ acc.id }}">
+          {{ acc.nickname || acc.account_type }} &middot; {{ acc.account_number | maskAccount }} &mdash; {{ acc.balance | currency }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="toAccountNumber">To account number</label>
+      <input type="text" id="toAccountNumber" name="toAccountNumber" class="form-control mono"
+        ng-model="vm.form.toAccountNumber" required placeholder="10-digit account number" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="amount">Amount (USD)</label>
+        <input type="number" id="amount" name="amount" class="form-control" min="0.01" step="0.01"
+          ng-model="vm.form.amount" required placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label for="description">Note (optional)</label>
+        <input type="text" id="description" name="description" class="form-control"
+          ng-model="vm.form.description" maxlength="255" placeholder="e.g. Rent" />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      Review transfer <i class="bi bi-arrow-right"></i>
+    </button>
+  </form>
+</div>
+
+<!-- Step 2: review & confirm -->
+<div class="card form-panel" ng-if="vm.step === 'review'">
+  <h2 style="font-size:1rem; margin-top:0;">Review before you send</h2>
+
+  <div class="review-summary">
+    <div class="review-row">
+      <span class="label">From</span>
+      <span>{{ vm.selectedFromAccount().nickname || vm.selectedFromAccount().account_type }} &middot; {{ vm.selectedFromAccount().account_number | maskAccount }}</span>
+    </div>
+    <div class="review-row">
+      <span class="label">To account number</span>
+      <span class="mono">{{ vm.form.toAccountNumber }}</span>
+    </div>
+    <div class="review-row" ng-if="vm.form.description">
+      <span class="label">Note</span>
+      <span>{{ vm.form.description }}</span>
+    </div>
+    <div class="review-row review-amount">
+      <span class="label">Amount</span>
+      <span class="value">{{ vm.form.amount | currency }}</span>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" ng-click="vm.confirmTransfer()" ng-disabled="vm.isSubmitting">
+      <span class="spinner" ng-if="vm.isSubmitting"></span>
+      <span ng-if="!vm.isSubmitting"><i class="bi bi-shield-check"></i> Confirm and send</span>
+      <span ng-if="vm.isSubmitting">Processing...</span>
+    </button>
+    <button class="btn btn-outline" ng-click="vm.backToForm()" ng-disabled="vm.isSubmitting">Back</button>
+  </div>
+</div>
+
+<!-- Step 3: success -->
+<div class="card form-panel" ng-if="vm.step === 'success'">
+  <div style="text-align:center; padding: 10px 0 24px;">
+    <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent-bg);color:var(--c-accent);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px;">
+      <i class="bi bi-check-lg"></i>
+    </div>
+    <h2 style="margin-bottom:6px;">Transfer complete</h2>
+    <p class="text-muted mono" style="font-size:1.3rem; margin:0;">{{ vm.successResult.amount | currency }}</p>
+    <p class="text-muted" style="font-size:0.85rem;">sent to account {{ vm.successResult.toAccount.accountNumber | maskAccount }}</p>
+  </div>
+  <div class="d-flex gap-2" style="justify-content:center;">
+    <button class="btn btn-outline" ng-click="vm.sendAnother()">Send another transfer</button>
+    <a href="#!/dashboard" class="btn btn-primary">Back to dashboard</a>
+  </div>
+</div>

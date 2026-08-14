@@ -1,0 +1,21 @@
+{
+  "name": "securebank-frontend",
+  "version": "1.0.0",
+  "description": "SecureBank Digital Banking - AngularJS (1.x) frontend",
+  "scripts": {
+    "postinstall": "node scripts/copy-vendor.js",
+    "start": "npx http-server src -p 8080 -c-1",
+    "build": "node scripts/copy-vendor.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "angular": "1.8.3",
+    "angular-route": "1.8.3",
+    "angular-resource": "1.8.3",
+    "bootstrap": "5.3.3",
+    "bootstrap-icons": "1.11.3"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
