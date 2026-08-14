@@ -8,7 +8,7 @@
      * setup, override it at deploy time by editing this value (or template
      * it out during your Docker build / CI pipeline).
      */
-    .constant('API_BASE_URL', 'http://localhost:5000/api')
+    .constant('API_BASE_URL', 'http://13.203.223.84:5000/api')
     .config(routeConfig)
     .run(runBlock);
 
