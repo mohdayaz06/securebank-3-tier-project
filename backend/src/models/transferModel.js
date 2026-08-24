@@ -34,4 +34,4 @@ const insert = async (
   );
 
   return result.insertId;
-};o
+};
