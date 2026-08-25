@@ -35,3 +35,4 @@ const insert = async (
 
   return result.insertId;
 };
+module.exports = { insert };

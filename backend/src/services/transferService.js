@@ -1,3 +1,8 @@
+const { v4: uuidv4 } = require('uuid');
+const { pool } = require('../config/db');
+const accountModel = require('../models/accountModel');
+const transactionModel = require('../models/transactionModel');
+const transferModel = require('../models/transferModel');
 const transferMoney = async (
   userId,
   { fromAccountId, toAccountNumber, amount, description }
@@ -127,3 +132,8 @@ const transferMoney = async (
     conn.release();
   }
 };
+const getTransfersForUser = async (userId, query) => {
+  return transferModel.findByUserAccounts(userId, query);
+};
+
+module.exports = { transferMoney, getTransfersForUser };
