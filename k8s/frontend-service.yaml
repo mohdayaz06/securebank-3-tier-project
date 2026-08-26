@@ -3,11 +3,9 @@ kind: Service
 metadata:
   name: securebank-frontend
 spec:
+  type: ClusterIP
   selector:
     app: securebank-frontend
   ports:
-    - protocol: TCP
-      port: 8080
+    - port: 8080
       targetPort: 8080
-      nodePort: 30080
-  type: NodePort
