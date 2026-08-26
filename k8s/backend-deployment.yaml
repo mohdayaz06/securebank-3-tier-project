@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: mohdayazz/securebank-backend:v1
+          image: mohdayazz/securebank-backend:v2
           ports:
             - containerPort: 5000
           env:
