@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: securebank-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: securebank-backend
+  template:
+    metadata:
+      labels:
+        app: securebank-backend
+    spec:
+      containers:
+        - name: backend
+          image: mohdayazz/securebank-backend:v1
+          ports:
+            - containerPort: 5000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "5000"
+            - name: DB_HOST
+              value: "mysql"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "securebank"
+            - name: DB_USER
+              value: "securebank_app"
+            - name: DB_PASSWORD
+              value: "test123"
+            - name: DB_CONNECTION_LIMIT
+              value: "10"
+            - name: JWT_SECRET
+              value: "change_this_to_a_long_random_secret_string"
+            - name: JWT_EXPIRES_IN
+              value: "1h"
+            - name: CORS_ORIGIN
+              value: "*"
