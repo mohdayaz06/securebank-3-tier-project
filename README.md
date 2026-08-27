@@ -31,59 +31,70 @@ SecureBank is a 3-tier banking application deployed on **Amazon EKS** using Dock
 * Transaction history
 * Internal & external transfers
 
-AWS Infrastructure
+## ☁️ AWS Infrastructure
 
 The application is deployed on AWS using:
 
--EKS
--EC2 worker nodes
--Application Load Balancer
--IAM
--VPC networking
--Kubernetes Services & Ingress
+* Amazon EKS
+* EC2 Worker Nodes
+* Application Load Balancer (ALB)
+* IAM
+* VPC Networking
+* Kubernetes Services & Ingress
 
-🐳 Docker
+---
 
-Separate Docker images are used for the frontend and backend.
+## 🐳 Docker
 
--securebank-frontend
--securebank-backend
+Separate Docker images are used for the frontend and backend:
 
-☸️ Kubernetes
+* `securebank-frontend`
+* `securebank-backend`
+
+---
+
+## ☸️ Kubernetes
 
 Kubernetes resources include:
 
--Frontend Deployment
--Backend Deployment
--Frontend Service
--Backend Service
--MySQL Deployment
--MySQL Service
--AWS ALB Ingress
+* Frontend Deployment
+* Backend Deployment
+* Frontend Service
+* Backend Service
+* MySQL Deployment
+* MySQL Service
+* AWS ALB Ingress
 
-🔁 GitOps with Argo CD
+---
 
-Argo CD continuously monitors the GitHub repository and synchronizes Kubernetes manifests with the EKS cluster.
+## 🔁 GitOps with Argo CD
 
-When Kubernetes configuration changes are pushed to GitHub, Argo CD can synchronize the changes to the cluster.
+Argo CD continuously monitors the GitHub repository and synchronizes Kubernetes manifests with the Amazon EKS cluster.
 
-🛠️ Troubleshooting Experience
+When Kubernetes configuration changes are pushed to GitHub, Argo CD detects the changes and synchronizes the desired state with the cluster.
 
-During deployment, I worked through several real-world issues, including:
+---
 
--Frontend unable to reach backend API
--AWS ALB health-check issues
--Kubernetes service and ingress routing problems
--MySQL authentication and connectivity issues
--Database schema/seed issues
--Docker image version mismatches
--Argo CD synchronization issues
--GitHub changes not being reflected in Kubernetes
--Backend 500 Internal Server Error during transfers
--External account transfer validation changes
+## 🛠️ Troubleshooting Experience
+
+During the deployment, I worked through several real-world issues, including:
+
+* Frontend unable to reach the backend API
+* AWS ALB health-check issues
+* Kubernetes Service and Ingress routing problems
+* MySQL authentication and connectivity issues
+* Database schema and seed issues
+* Docker image version mismatches
+* Argo CD synchronization issues
+* GitHub changes not being reflected in Kubernetes
+* Backend `500 Internal Server Error` during transfers
+* External account transfer validation issues
+
+### 🔍 Troubleshooting Tools
 
 These issues were diagnosed using:
 
+```bash
 kubectl get pods
 kubectl describe pod
 kubectl logs
@@ -93,6 +104,8 @@ kubectl exec
 curl
 git
 docker
+```
+
 
 ## 🔄 CI/CD Pipeline
 
