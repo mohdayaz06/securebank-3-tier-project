@@ -1,148 +1,343 @@
-# SecureBank — Digital Banking Application
+# SecureBank Digital Banking System
 
-A complete 3-tier full-stack banking application built for DevOps practice:
+### End-to-End DevOps & GitOps Project on AWS EKS
 
-- **Frontend:** AngularJS 1.8.3 (ngRoute, ngResource), Bootstrap 5, custom design system
-- **Backend:** Node.js + Express REST API
-- **Database:** MySQL only (raw SQL via `mysql2`, no ORM)
-- **Auth:** JWT, bcrypt password hashing, account lockout, audit logging
+A production-style digital banking application deployed on **Amazon EKS** with containerization, Kubernetes orchestration, AWS ALB Ingress, and GitOps deployment using Argo CD.
 
-No Dockerfiles, Compose files, Kubernetes manifests, or Jenkinsfiles are
-included on purpose — this project is meant to be containerized,
-pipelined, and deployed by you as DevOps practice.
+The project demonstrates an end-to-end DevOps workflow from application development and Docker containerization to Kubernetes deployment and GitOps-based application management.
 
-```
-banking-app/
-├── frontend/     AngularJS single-page application (static files)
-├── backend/      Node.js/Express REST API
-└── database/     MySQL schema + seed data
+---
+
+## 📌 Project Overview
+
+SecureBank is a 3-tier banking application consisting of:
+
+* AngularJS frontend
+* Node.js/Express backend API
+* MySQL database
+
+The application provides basic banking functionality such as user registration, login, account management, balance management, money transfers, and transaction history.
+
+The application is containerized using Docker and deployed on Amazon EKS using Kubernetes.
+
+---
+
+## 🏗️ Architecture
+
+<img width="1600" alt="SecureBank Architecture" src="YOUR_ARCHITECTURE_IMAGE_URL">
+
+### Application Flow
+
+```text
+User
+  ↓
+AWS Application Load Balancer
+  ↓
+Kubernetes Ingress
+  ↓
+Frontend Service
+  ↓
+Frontend Pods
+  ↓
+Backend Service
+  ↓
+Backend Pods
+  ↓
+MySQL
 ```
 
 ---
 
-## 1. Prerequisites
+## 🛠️ Tech Stack
 
-- Node.js 18+ and npm
-- MySQL 8.x running locally, in a container, or a hosted instance
+| Category                   | Technology                    |
+| -------------------------- | ----------------------------- |
+| ☁️ Cloud                   | AWS                           |
+| ☸️ Container Orchestration | Amazon EKS                    |
+| 🐳 Containerization        | Docker                        |
+| 🔄 GitOps                  | Argo CD                       |
+| 📦 Container Registry      | Docker Hub                    |
+| 🌐 Load Balancer           | AWS Application Load Balancer |
+| 🔀 Networking              | Kubernetes Ingress            |
+| ⚙️ Backend                 | Node.js + Express             |
+| 🖥️ Frontend               | AngularJS                     |
+| 🗄️ Database               | MySQL                         |
+| 🔐 Authentication          | JWT                           |
+| 📊 Database Connectivity   | MySQL2                        |
 
-## 2. Database setup
+---
+
+## 🔄 Deployment Workflow
+
+The application follows this deployment workflow:
+
+* Develop application
+* Build Docker images
+* Push images to Docker Hub
+* Store Kubernetes manifests in GitHub
+* Argo CD monitors the GitHub repository
+* Argo CD synchronizes Kubernetes manifests
+* Application is deployed to Amazon EKS
+* AWS ALB exposes the application externally
+
+```text
+GitHub
+   ↓
+Docker Build
+   ↓
+Docker Hub
+   ↓
+Kubernetes Manifests
+   ↓
+Argo CD
+   ↓
+Amazon EKS
+   ↓
+AWS ALB
+   ↓
+SecureBank
+```
+
+---
+
+## 🚀 GitOps with Argo CD
+
+Argo CD is used to manage the Kubernetes deployment using GitOps principles.
+
+The Kubernetes manifests are stored in GitHub and Argo CD continuously monitors the repository.
+
+When changes are pushed to GitHub:
+
+* Argo CD detects the new commit.
+* Kubernetes manifests are synchronized.
+* Updated application versions are deployed to EKS.
+* Argo CD reports the application health and synchronization status.
+
+<img width="1915" alt="Argo CD" src="YOUR_ARGOCD_IMAGE_URL">
+
+---
+
+## ☸️ Kubernetes Architecture
+
+The application is deployed on an Amazon EKS cluster using multiple Kubernetes resources.
+
+### Components
+
+* Frontend Deployment
+* Backend Deployment
+* MySQL Deployment
+* Frontend Service
+* Backend Service
+* MySQL Service
+* Kubernetes Ingress
+* AWS Application Load Balancer
+
+The AWS ALB receives external traffic and Kubernetes Ingress routes:
+
+```text
+/     → Frontend Service
+/api  → Backend Service
+```
+
+---
+
+## 💳 Banking Features
+
+The application supports:
+
+* User registration
+* User login
+* Account management
+* Account balance
+* Money transfers
+* Transaction history
+* Internal account transfers
+* External recipient transfers
+* Transaction records
+
+---
+
+## 🔐 Database
+
+MySQL stores:
+
+* Users
+* Accounts
+* Transactions
+* Transfers
+
+The backend connects to MySQL through the Kubernetes service:
+
+```text
+Backend → mysql:3306 → securebank
+```
+
+---
+
+## 🐳 Docker
+
+Separate Docker images are used for the application tiers:
+
+```text
+mohdayazz/securebank-frontend
+mohdayazz/securebank-backend
+```
+
+The frontend and backend run as separate containers and are deployed independently using Kubernetes Deployments.
+
+---
+
+## 🔧 Troubleshooting & Problem Solving
+
+During the deployment, I faced and resolved several real-world DevOps issues.
+
+### 1. Frontend → Backend Connectivity
+
+Initially, the frontend was configured with the EC2 public IP and backend port.
+
+This caused connectivity issues after moving the application behind the Kubernetes Ingress.
+
+**Solution:**
+
+Changed the frontend API configuration to:
+
+```text
+/api
+```
+
+and configured Kubernetes Ingress to route `/api` requests to the backend service.
+
+---
+
+### 2. AWS ALB Health Checks
+
+The ALB was configured to use:
+
+```text
+/healthz
+```
+
+The backend health endpoint was verified using Kubernetes logs and ALB health-check requests.
+
+---
+
+### 3. MySQL Connectivity
+
+The backend initially experienced database connectivity/authentication issues.
+
+Troubleshooting included:
 
 ```bash
-mysql -u root -p < database/schema.sql
-mysql -u root -p securebank < database/seed.sql
+kubectl logs
+kubectl exec
+mysql
 ```
 
-Create an application-specific MySQL user rather than using `root` for the
-backend connection, e.g.:
+The backend was ultimately configured to connect through the Kubernetes MySQL service:
 
-```sql
-CREATE USER 'securebank_app'@'%' IDENTIFIED BY 'change_this_password';
-GRANT SELECT, INSERT, UPDATE, DELETE ON securebank.* TO 'securebank_app'@'%';
-FLUSH PRIVILEGES;
+```text
+mysql:3306
 ```
 
-Demo credentials created by `seed.sql` (see `database/README.md` for the
-full list) — all share the password `Password@123`.
+---
 
-## 3. Backend setup
+### 4. Docker Image Version Mismatch
+
+At one point, the Kubernetes Deployment was still running an older Docker image even though the GitHub manifest had been updated.
+
+I verified the actual image running inside the cluster using:
 
 ```bash
-cd backend
-cp .env.example .env      # edit .env: DB_* credentials, JWT_SECRET, etc.
-npm install
-npm run dev                # http://localhost:5000 (nodemon, auto-reload)
-# or: npm start            # production start
+kubectl get deployment
+kubectl get pod
+kubectl describe deployment
 ```
 
-Health check: `GET http://localhost:5000/healthz`
+This helped identify the difference between the Git repository configuration and the currently deployed Kubernetes resources.
 
-## 4. Frontend setup
+---
+
+### 5. Argo CD Synchronization
+
+After configuring Argo CD, changes in GitHub were not immediately reflected in the running deployment.
+
+I verified:
 
 ```bash
-cd frontend
-npm install                 # also copies AngularJS/Bootstrap into src/vendor
-npm start                   # serves src/ at http://localhost:8080
+git status
+git log
+kubectl get deployment
+kubectl get pods
 ```
 
-The frontend calls the API at the URL defined in
-`frontend/src/app/app.config.js` (`API_BASE_URL` constant, default
-`http://localhost:5000/api`). Update this for staging/production, or
-template it out in your CI/CD pipeline.
+and confirmed that the correct image version was eventually deployed through Argo CD.
 
 ---
 
-## 5. REST API reference
+### 6. Transfer API 500 Error
 
-All endpoints are prefixed with `/api`. Protected routes require
-`Authorization: Bearer <token>`.
+The transfer API initially returned:
 
-| Method | Endpoint                        | Access  | Description                          |
-|--------|-----------------------------------|---------|----------------------------------------|
-| POST   | `/auth/register`                  | Public  | Register + auto-opens a checking account |
-| POST   | `/auth/login`                     | Public  | Authenticate, returns JWT               |
-| GET    | `/auth/me`                        | Auth    | Current user profile                    |
-| PUT    | `/auth/profile`                     | Auth    | Update name/phone                       |
-| PUT    | `/auth/change-password`             | Auth    | Change password                         |
-| GET    | `/accounts`                        | Auth    | List the current user's accounts        |
-| POST   | `/accounts`                        | Auth    | Open a new account                      |
-| GET    | `/accounts/:id`                     | Auth    | Get one account                         |
-| GET    | `/transactions/account/:accountId`   | Auth    | Paginated ledger history                |
-| POST   | `/transactions/deposit`             | Auth    | Deposit into an account                 |
-| POST   | `/transactions/withdraw`            | Auth    | Withdraw from an account                 |
-| POST   | `/transfers`                       | Auth    | Transfer money between accounts          |
-| GET    | `/transfers`                       | Auth    | List the current user's transfers        |
+```text
+500 Internal Server Error
+```
 
-## 6. How money transfers stay safe
+I investigated the backend transfer service, transfer model, and MySQL schema.
 
-`backend/src/services/transferService.js` wraps every transfer in a single
-MySQL transaction:
+The database schema was updated to support the recipient account information required by the application.
 
-1. Both the source and destination account rows are locked with
-   `SELECT ... FOR UPDATE`, always in ascending account-id order — this
-   prevents deadlocks when two transfers between the same pair of accounts
-   run concurrently in opposite directions.
-2. Balance and status are re-checked *after* locking (not before), so a
-   concurrent transfer can't slip in and overdraw the account.
-3. The debit, the credit, both ledger rows (`transactions`), and the
-   transfer record (`transfers`) all commit together or roll back together.
-
-This is worth reading before you load-test the transfer endpoint — it's
-the piece of the app that actually needs to be correct under concurrency.
+After rebuilding and deploying the backend image, transfers worked successfully.
 
 ---
 
-## 7. Environment variables (backend)
+## 📸 Application Screenshots
 
-See `backend/.env.example`: `NODE_ENV`, `PORT`, `DB_HOST`, `DB_PORT`,
-`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_CONNECTION_LIMIT`, `JWT_SECRET`,
-`JWT_EXPIRES_IN`, `CORS_ORIGIN`, `RATE_LIMIT_*`, `AUTH_RATE_LIMIT_*`.
+### Login Page
+
+<img width="1920" alt="SecureBank Login" src="YOUR_LOGIN_IMAGE_URL">
+
+### Dashboard
+
+<img width="1920" alt="SecureBank Dashboard" src="YOUR_DASHBOARD_IMAGE_URL">
+
+### Money Transfer
+
+<img width="1920" alt="SecureBank Money Transfer" src="YOUR_TRANSFER_IMAGE_URL">
+
+### Transaction History
+
+<img width="1920" alt="SecureBank Transaction History" src="YOUR_TRANSACTION_IMAGE_URL">
 
 ---
 
-## 8. Suggested DevOps practice path
+## ☸️ Kubernetes Deployment
 
-1. **Dockerfiles** — one for `backend/` (Node base image, `npm ci`, expose
-   port 5000) and one for `frontend/` (multi-stage: `npm install` in a
-   Node stage to run `copy-vendor.js`, then copy `src/` into an Nginx
-   image). MySQL can run from the official `mysql:8` image, with
-   `schema.sql`/`seed.sql` mounted into `/docker-entrypoint-initdb.d/`.
-2. **Manual container runs** — run MySQL, backend, and frontend as three
-   separate containers on a shared Docker network; verify with `curl`
-   before automating anything.
-3. **Push to Docker Hub** — tag and push both images.
-4. **Jenkins CI/CD** — build → test → push → deploy.
-5. **SonarQube** — add static code-quality scanning to the pipeline.
-6. **Trivy** — scan both images for vulnerabilities before deploy.
-7. **Kubernetes** — Deployments for frontend/backend, a StatefulSet +
-   PersistentVolumeClaim for MySQL, Services, an Ingress for the frontend,
-   ConfigMaps/Secrets for env vars (never bake `JWT_SECRET` or DB
-   credentials into an image), and liveness/readiness probes against
-   `/healthz` (backend) and `/` (frontend).
-8. **Argo CD** — GitOps deployment once the Kubernetes manifests live in
-   a Git repo.
-9. **Prometheus + Grafana** — add metrics (consider `prom-client` in the
-   backend for custom metrics like transfer volume/latency) and dashboards.
+<img width="1920" alt="Kubernetes Deployment" src="YOUR_KUBERNETES_IMAGE_URL">
 
-The `/healthz` endpoint on the backend and plain static file serving on
-the frontend are both deliberately simple so they're easy to wire into
-probes and load balancer health checks.
+---
+
+## 🎯 Key DevOps Learnings
+
+Through this project I gained hands-on experience with:
+
+* Docker containerization
+* Kubernetes deployments
+* Amazon EKS
+* AWS Application Load Balancer
+* Kubernetes Ingress
+* GitHub-based deployment workflows
+* Argo CD GitOps
+* MySQL troubleshooting
+* Application troubleshooting
+* Network troubleshooting
+* Docker image version management
+* Kubernetes health checks
+* Debugging HTTP 4xx/5xx errors
+
+---
+
+## 👨‍💻 Author
+
+**Mohammed Ayaz**
+
+DevOps Engineer | AWS | Kubernetes | Docker | Terraform | Jenkins | Argo CD
