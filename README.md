@@ -35,30 +35,31 @@ AWS Infrastructure
 
 The application is deployed on AWS using:
 
-EKS
-EC2 worker nodes
-Application Load Balancer
-IAM
-VPC networking
-Kubernetes Services & Ingress
+-EKS
+-EC2 worker nodes
+-Application Load Balancer
+-IAM
+-VPC networking
+-Kubernetes Services & Ingress
 
 🐳 Docker
 
 Separate Docker images are used for the frontend and backend.
 
-securebank-frontend
-securebank-backend
+-securebank-frontend
+-securebank-backend
+
 ☸️ Kubernetes
 
 Kubernetes resources include:
 
-Frontend Deployment
-Backend Deployment
-Frontend Service
-Backend Service
-MySQL Deployment
-MySQL Service
-AWS ALB Ingress
+-Frontend Deployment
+-Backend Deployment
+-Frontend Service
+-Backend Service
+-MySQL Deployment
+-MySQL Service
+-AWS ALB Ingress
 
 🔁 GitOps with Argo CD
 
@@ -70,16 +71,16 @@ When Kubernetes configuration changes are pushed to GitHub, Argo CD can synchron
 
 During deployment, I worked through several real-world issues, including:
 
-Frontend unable to reach backend API
-AWS ALB health-check issues
-Kubernetes service and ingress routing problems
-MySQL authentication and connectivity issues
-Database schema/seed issues
-Docker image version mismatches
-Argo CD synchronization issues
-GitHub changes not being reflected in Kubernetes
-Backend 500 Internal Server Error during transfers
-External account transfer validation changes
+-Frontend unable to reach backend API
+-AWS ALB health-check issues
+-Kubernetes service and ingress routing problems
+-MySQL authentication and connectivity issues
+-Database schema/seed issues
+-Docker image version mismatches
+-Argo CD synchronization issues
+-GitHub changes not being reflected in Kubernetes
+-Backend 500 Internal Server Error during transfers
+-External account transfer validation changes
 
 These issues were diagnosed using:
 
