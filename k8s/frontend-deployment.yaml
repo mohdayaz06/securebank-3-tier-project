@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: mohdayazz/securebank-frontend:v3
+          image: mohdayazz/securebank-frontend:v1
           ports:
             - containerPort: 8080
